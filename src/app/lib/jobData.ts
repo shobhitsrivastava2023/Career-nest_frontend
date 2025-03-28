@@ -1,0 +1,118 @@
+export const jobData = [
+    {
+      id: "1",
+      title: "Senior Python Developer",
+      company: "TechCorp",
+      location: "San Francisco, CA",
+      postedDate: "2 days ago",
+      tags: ["python", "django", "flask"],
+      description:
+        "We're looking for an experienced Python developer to join our backend team. You'll be responsible for designing and implementing high-performance APIs and services.",
+    },
+    {
+      id: "2",
+      title: "Python Data Scientist",
+      company: "DataWorks",
+      location: "Remote",
+      postedDate: "1 week ago",
+      tags: ["python", "pandas", "tensorflow"],
+      description:
+        "Join our data science team to build machine learning models and analyze large datasets using Python and related libraries.",
+    },
+    {
+      id: "3",
+      title: "Python Full Stack Engineer",
+      company: "WebSolutions",
+      location: "New York, NY",
+      postedDate: "3 days ago",
+      tags: ["python", "react", "fastapi"],
+      description:
+        "Looking for a full stack developer with strong Python skills to work on our web applications and services.",
+    },
+    {
+      id: "4",
+      title: "Python Automation Engineer",
+      company: "AutoSystems",
+      location: "Chicago, IL",
+      postedDate: "Just now",
+      tags: ["python", "selenium", "pytest"],
+      description: "Help us build and maintain our test automation framework using Python and related testing tools.",
+    },
+    {
+      id: "5",
+      title: "Java Backend Developer",
+      company: "Enterprise Solutions",
+      location: "Austin, TX",
+      postedDate: "1 day ago",
+      tags: ["java", "spring", "hibernate"],
+      description:
+        "Develop and maintain our Java-based microservices architecture. Experience with Spring Boot and cloud technologies is a plus.",
+    },
+    {
+      id: "6",
+      title: "Java Android Developer",
+      company: "MobileApps",
+      location: "Seattle, WA",
+      postedDate: "3 days ago",
+      tags: ["java", "android", "kotlin"],
+      description:
+        "Build and enhance our Android applications using Java and Kotlin. You'll work closely with our design and backend teams.",
+    },
+    {
+      id: "7",
+      title: "Java Enterprise Architect",
+      company: "FinTech Inc.",
+      location: "Boston, MA",
+      postedDate: "1 week ago",
+      tags: ["java", "j2ee", "microservices"],
+      description: "Design and implement large-scale Java enterprise applications for the financial sector.",
+    },
+    {
+      id: "8",
+      title: "Java DevOps Engineer",
+      company: "CloudOps",
+      location: "Remote",
+      postedDate: "2 days ago",
+      tags: ["java", "jenkins", "kubernetes"],
+      description: "Manage our CI/CD pipelines and infrastructure for Java applications deployed in cloud environments.",
+    },
+    {
+      id: "9",
+      title: "C++ Game Developer",
+      company: "GameStudio",
+      location: "Los Angeles, CA",
+      postedDate: "Just now",
+      tags: ["c++", "unreal", "directx"],
+      description: "Join our game development team to create high-performance game engines and systems using C++.",
+    },
+    {
+      id: "10",
+      title: "C++ Systems Programmer",
+      company: "LowLevel Systems",
+      location: "San Jose, CA",
+      postedDate: "3 days ago",
+      tags: ["c++", "linux", "networking"],
+      description:
+        "Develop high-performance systems software for our networking products. Strong C++ and systems programming skills required.",
+    },
+    {
+      id: "11",
+      title: "C++ Embedded Developer",
+      company: "IoT Devices",
+      location: "Portland, OR",
+      postedDate: "5 days ago",
+      tags: ["c++", "embedded", "rtos"],
+      description: "Design and implement firmware for our IoT devices using C++ and real-time operating systems.",
+    },
+    {
+      id: "12",
+      title: "C++ Quantitative Developer",
+      company: "Trading Systems",
+      location: "Chicago, IL",
+      postedDate: "1 week ago",
+      tags: ["c++", "algorithms", "finance"],
+      description: "Build high-frequency trading systems using C++ with a focus on performance and reliability.",
+    },
+  ]
+  
+  
