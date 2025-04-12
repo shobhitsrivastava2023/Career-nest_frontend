@@ -77,7 +77,7 @@ const DialogueSelector: React.FC = () => {
               onClick={handleResearchFormSubmit}
               className="w-full p-3 bg-zinc-700 hover:bg-zinc-600 rounded text-center transition-colors"
             >
-              Research
+              Researches
             </button>
           </div>
         </div>
