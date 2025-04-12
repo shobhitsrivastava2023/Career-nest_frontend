@@ -71,7 +71,7 @@ const DialogueSelector: React.FC = () => {
               onClick={() => handleOptionSelect('professional')}
               className="w-full p-3 bg-zinc-950 hover:bg-zinc-600 rounded text-center transition-colors"
             >
-              Professionals
+              Industries
             </button>
             <button
               onClick={handleResearchFormSubmit}
