@@ -18,9 +18,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useSonner } from 'sonner';
+import { toast } from 'sonner'; // Fixed import for toast
+
+type PositionType = "student" | "sde" | "sre" | "sde-ii" | "ml-engineer" | "designer";
 
 const positionOptions = [
   { value: "student", label: "Student" },
@@ -31,7 +33,7 @@ const positionOptions = [
   { value: "designer", label: "Designer" },
 ];
 
-const socialLinks = {
+const socialLinks: Record<PositionType, { name: string, icon: JSX.Element }[]> = {
   student: [
     { name: "LinkedIn", icon: <FaLinkedin className="text-primary" /> },
     { name: "GitHub", icon: <FaGithub /> },
@@ -73,7 +75,7 @@ const socialLinks = {
 
 interface FormData {
   name: string;
-  position: string;
+  position: PositionType | "";
   links: string[];
   skills: string[];
 }
@@ -87,7 +89,7 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     position: "",
-    links: ["", "", ""],
+    links: [],
     skills: [],
   });
 
@@ -98,38 +100,51 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
   ]);
 
   const [customSkill, setCustomSkill] = useState("");
-  const [selectedPosition, setSelectedPosition] = useState("");
-  const { toast } = useSonner();
+  const [selectedPosition, setSelectedPosition] = useState<PositionType | "">("");
 
   // Load existing data if available
   useEffect(() => {
     try {
       const savedData = localStorage.getItem('professionalProfile');
       if (savedData) {
-        const parsedData = JSON.parse(savedData);
+        const parsedData = JSON.parse(savedData) as FormData;
         setFormData(parsedData);
-        setSelectedPosition(parsedData.position);
-        handlePositionChange(parsedData.position, true);
+        if (parsedData.position) {
+          setSelectedPosition(parsedData.position as PositionType);
+          handlePositionChange(parsedData.position as PositionType, true);
+        }
       }
     } catch (error) {
       console.error("Error loading saved profile:", error);
     }
   }, []);
 
-  const handlePositionChange = (position: string, isInitialLoad = false) => {
-    setSelectedPosition(position);
+  const handlePositionChange = (position: PositionType | "", isInitialLoad = false) => {
+    setSelectedPosition(position as PositionType);
     
-    if (!isInitialLoad) {
+    if (!position) {
       setFormData(prev => ({
         ...prev,
-        position,
-        links: Array(socialLinks[position]?.length || 0).fill(""), // Reset links when position changes
+        position: "",
+        links: [],
+      }));
+      return;
+    }
+    
+    const positionKey = position as PositionType;
+    
+    if (!isInitialLoad) {
+      const linkCount = socialLinks[positionKey]?.length || 0;
+      setFormData(prev => ({
+        ...prev,
+        position: positionKey,
+        links: Array(linkCount).fill(""), // Reset links when position changes
       }));
     } else {
       // Just update the position without resetting links (for initial load)
       setFormData(prev => ({
         ...prev,
-        position,
+        position: positionKey,
       }));
     }
 
@@ -189,7 +204,7 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
   };
 
   const addCustomSkill = () => {
-    if (customSkill && !availableSkills.includes(customSkill)) {
+    if (customSkill.trim() && !availableSkills.includes(customSkill) && !formData.skills.includes(customSkill)) {
       setAvailableSkills(prev => [...prev, customSkill]);
       toggleSkill(customSkill);
       setCustomSkill("");
@@ -199,6 +214,11 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.position) {
+      toast("Please select a position before saving.");
+      return;
+    }
+
     // Save to localStorage
     localStorage.setItem('professionalProfile', JSON.stringify(formData));
     
@@ -209,51 +229,48 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
     }));
     
     // Call the onSubmit prop if provided
-    router.push('/Dashboard');
+    if (onSubmit) {
+      onSubmit(formData);
+    }
     
     // Show success message
-    toast({
-      title: "Profile Updated",
-      description: "Your professional profile has been saved successfully.",
-      duration: 3000,
+    toast("Profile Updated", {
+      description: "Your professional profile has been saved successfully."
     });
     
     // Navigate to dashboard
-    
+    router.push('/Dashboard');
   };
 
   const handleDelete = () => {
-      // Remove from localStorage
-      localStorage.removeItem('professionalProfile');
+    // Remove from localStorage
+    localStorage.removeItem('professionalProfile');
 
-      // Dispatch storage event
-      window.dispatchEvent(new StorageEvent('storage', {
-          key: 'professionalProfile',
-          newValue: null,
-      }));
+    // Dispatch storage event
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'professionalProfile',
+      newValue: null,
+    }));
 
-      // Reset state
-      setFormData({
-          name: "",
-          position: "",
-          links: ["", "", ""],
-          skills: [],
-      });
-      setSelectedPosition("");
-      setAvailableSkills(["Problem Solving", "Communication", "Teamwork"]);
-      setCustomSkill("");
+    // Reset state
+    setFormData({
+      name: "",
+      position: "",
+      links: [],
+      skills: [],
+    });
+    setSelectedPosition("");
+    setAvailableSkills(["Problem Solving", "Communication", "Teamwork"]);
+    setCustomSkill("");
 
-      // Show success message
-      toast({
-          title: "Profile Deleted",
-          description: "Your professional profile has been deleted.",
-          duration: 3000,
-      });
+    // Show success message
+    toast("Profile Deleted", {
+      description: "Your professional profile has been deleted."
+    });
 
-      // Optionally, redirect to a different page
-      router.push('/'); // Or wherever appropriate
+    // Redirect to home page
+    router.push('/');
   };
-
 
   return (
     <div className="flex justify-center items-center min-h-screen p-4 text-zinc-100">
@@ -276,11 +293,14 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
             </div>
             <div>
               <Label htmlFor="position">Position</Label>
-              <Select value={selectedPosition} onValueChange={(value) => handlePositionChange(value)}>
+              <Select 
+                value={selectedPosition} 
+                onValueChange={(value) => handlePositionChange(value as PositionType)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a position" />
                 </SelectTrigger>
-                <SelectContent  className='bg-white'>
+                <SelectContent className='bg-white'>
                   {positionOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -290,21 +310,23 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
               </Select>
             </div>
 
-            <div>
-              <Label>Social Links</Label>
-              {socialLinks[formData.position]?.map((link, index) => (
-                <div key={link.name} className="mb-2 flex items-center space-x-2">
-                  {link.icon}
-                  <Input
-                    type="url"
-                    placeholder={`Your ${link.name} URL`}
-                    value={formData.links[index] || ""}
-                    onChange={(e) => handleLinkChange(index, e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-              ))}
-            </div>
+            {formData.position && (
+              <div>
+                <Label>Social Links</Label>
+                {socialLinks[formData.position as PositionType]?.map((link, index) => (
+                  <div key={link.name} className="mb-2 flex items-center space-x-2">
+                    {link.icon}
+                    <Input
+                      type="url"
+                      placeholder={`Your ${link.name} URL`}
+                      value={formData.links[index] || ""}
+                      onChange={(e) => handleLinkChange(index, e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div>
               <Label>Skills</Label>
@@ -326,6 +348,12 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
                   placeholder="Add Custom Skill"
                   value={customSkill}
                   onChange={(e) => setCustomSkill(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCustomSkill();
+                    }
+                  }}
                 />
                 <Button type="button" variant="secondary" size="sm" onClick={addCustomSkill}>
                   <PlusCircle className="h-4 w-4 mr-2" />
@@ -334,14 +362,14 @@ const ProfessionalForm = ({ onSubmit }: ProfessionalFormProps) => {
               </div>
             </div>
 
-            <Button  onClick={handleSubmit} className="w-full">Save Profile</Button>
-             <Button
-                type="button"
-                variant="destructive"
-                className="w-full"
-                onClick={handleDelete}
+            <Button type="submit" className="w-full">Save Profile</Button>
+            <Button
+              type="button"
+              variant="destructive"
+              className="w-full"
+              onClick={handleDelete}
             >
-                Delete Profile
+              Delete Profile
             </Button>
           </form>
         </CardContent>
