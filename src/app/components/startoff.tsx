@@ -1,139 +1,126 @@
-// components/DialogueSelector.jsx
-"use client";
+/**
+ * Career Nest Homepage
+ * A professional profile management platform
+ */
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-import { useState } from 'react';
-import ProfessionalForm from './professionalform';
-import { useRouter } from 'next/navigation';
-
-interface UserData {
-  name?: string;
-  position?: string;
-  skills?: string[];
-}
-
-interface ResearchFormProps {
-  onSubmit: () => void;
-}
-
-const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit }) => (
-
-  
-
-
-  <div className="bg-zinc-800 text-zinc-100 p-8 rounded-lg max-w-md w-full mx-auto border border-zinc-700">
-    <h2 className="text-xl font-bold mb-6 text-center">Research</h2>
-    {/* Research form fields would go here */}
-    <button
-      onClick={onSubmit}
-      className="w-full py-2 px-4 bg-zinc-100 text-zinc-900 rounded-full font-medium hover:bg-zinc-200 transition-colors"
-    >
-      Submit
-    </button>
-  </div>
-);
-
-const DialogueSelector: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<'professional' | 'research' | null>(null);
-  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const router  = useRouter()
-
-  const handleOptionSelect = (option: 'professional' | 'research') => {
-    setSelectedOption(option);
-  };
-
-  const handleFormSubmit = (data: UserData) => {
-    setUserData(data);
-    setFormSubmitted(true);
-    console.log("Form submitted with data:", data);
-  };
-
-  const handleResearchFormSubmit = () => { 
-    console.log("you have been redirected to research signIn  page")
-    router.push('/ResearchSignIn')
-  
-
-  }
-
-  const resetForm = () => {
-    setSelectedOption(null);
-    setFormSubmitted(false);
-    setUserData(null);
-  };
-
-  // Initial dialogue selection
-  if (!selectedOption) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="bg-zinc-900 text-zinc-100 p-8 rounded-lg max-w-md w-full ">
-          <div className="space-y-4">
-            <button
-              onClick={() => handleOptionSelect('professional')}
-              className="w-full p-3 bg-zinc-950 hover:bg-zinc-600 rounded text-center transition-colors"
-            >
-              Industries
-            </button>
-            <button
-              onClick={handleResearchFormSubmit}
-              className="w-full p-3 bg-zinc-700 hover:bg-zinc-600 rounded text-center transition-colors"
-            >
-              Researches
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Form submission success screen
-  if (formSubmitted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
-        <div className="bg-zinc-800 text-zinc-100 p-8 rounded-lg max-w-md w-full border border-zinc-700">
-          <h2 className="text-xl font-bold mb-6 text-center">Submission Successful!</h2>
-          <div className="mb-6">
-            <p className="text-green-400 mb-4">Thank you for your submission.</p>
-            {userData && (
-              <div className="bg-zinc-700 p-4 rounded">
-                <h3 className="font-bold mb-2">Your Information:</h3>
-                <p><span className="text-zinc-400">Name:</span> {userData.name}</p>
-                <p><span className="text-zinc-400">Position:</span> {userData.position}</p>
-                {userData.skills && userData.skills.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-zinc-400">Skills:</p>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {userData.skills.map((skill) => (
-                        <span key={skill} className="bg-blue-600 px-2 py-1 rounded-full text-xs">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <button
-            onClick={resetForm}
-            className="w-full py-2 px-4 bg-zinc-100 text-zinc-900 rounded-full font-medium hover:bg-zinc-200 transition-colors"
-          >
-            Start Over
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Render the selected form
+export default function Homepage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      {selectedOption === 'professional' ? (
-        <ProfessionalForm onSubmit={handleFormSubmit} />
-      ) : (
-        <ResearchForm onSubmit={() => handleFormSubmit({})} />
-      )}
+    <div className="flex flex-col min-h-[100dvh]">
+      <header className="px-4 lg:px-6 h-14 flex items-center">
+        <Link href="/" className="flex items-center justify-center gap-2" prefetch={false}>
+          <NestIcon className="h-6 w-6 text-primary" />
+          <span className="font-bold text-lg">Career Nest</span>
+        </Link>
+        <nav className="ml-auto flex gap-4 sm:gap-6">
+          <Link href="/about" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            About
+          </Link>
+          <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            Contact
+          </Link>
+        </nav>
+      </header>
+      <main className="flex-1">
+        <section className="w-full py-16 md:py-24 lg:py-32 flex items-center justify-center border-b">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center text-center">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-3xl">
+                Your Professional Profile, Simplified
+              </h1>
+              <p className="mt-6 text-lg text-gray-500 max-w-2xl md:text-xl dark:text-gray-400">
+                Career Nest helps you create, manage, and share your professional profile. 
+                Build your portfolio in minutes and apply for jobs with ease.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 mt-8">
+                <Link
+                  href="/professional"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+                  prefetch={false}
+                >
+                  Professional
+                </Link>
+                <Link
+                  href="/academia"
+                  className="inline-flex h-10 items-center justify-center rounded-md border border-primary bg-transparent px-8 py-2 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+                  prefetch={false}
+                >
+                  Academia
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="w-full py-16 md:py-24 lg:py-32 bg-gray-50 dark:bg-gray-900">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
+                  Why Career Nest?
+                </div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Build. Share. Apply.</h2>
+                <p className="mt-4 max-w-[800px] text-gray-500 md:text-xl/relaxed dark:text-gray-400">
+                  Career Nest streamlines your job search by creating professional summaries that highlight your
+                  skills and experience. One profile, countless opportunities.
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid items-stretch gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3 mt-16">
+              <div className="grid gap-1 p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 h-full">
+                <h3 className="text-xl font-bold">Smart Profile Builder</h3>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">
+                  Create tailored professional profiles with our intuitive builder. Add your skills, experience, and links to your portfolio.
+                </p>
+              </div>
+              <div className="grid gap-1 p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 h-full">
+                <h3 className="text-xl font-bold">One-Click Applications</h3>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">
+                  Apply to multiple job postings with a single click. Your profile is automatically formatted for each application.
+                </p>
+              </div>
+              <div className="grid gap-1 p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 h-full">
+                <h3 className="text-xl font-bold">Profile Analytics</h3>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">
+                  Track who's viewing your profile and which skills are getting the most attention from recruiters.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
+        <p className="text-xs text-gray-500 dark:text-gray-400">&copy; 2025 Career Nest. All rights reserved.</p>
+        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+          <Link href="/terms" className="text-xs hover:underline underline-offset-4" prefetch={false}>
+            Terms of Service
+          </Link>
+          <Link href="/privacy" className="text-xs hover:underline underline-offset-4" prefetch={false}>
+            Privacy
+          </Link>
+        </nav>
+      </footer>
     </div>
   );
-};
+}
 
-export default DialogueSelector;
+function NestIcon(props:any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z" />
+      <path d="m8 8 8 8" />
+      <path d="m16 8-8 8" />
+    </svg>
+  );
+}
