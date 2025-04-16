@@ -1,11 +1,18 @@
-/**
- * Career Nest Homepage
- * A professional profile management platform
- */
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+"use client"
 
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { AuthModal } from "./auth-modal"
 export default function Homepage() {
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authType, setAuthType] = useState<"professional" | "academia">("professional")
+
+  const openAuthModal = (type: "professional" | "academia") => {
+    setAuthType(type)
+    setAuthModalOpen(true)
+  }
+
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="px-4 lg:px-6 h-14 flex items-center">
@@ -30,24 +37,23 @@ export default function Homepage() {
                 Your Professional Profile, Simplified
               </h1>
               <p className="mt-6 text-lg text-gray-500 max-w-2xl md:text-xl dark:text-gray-400">
-                Career Nest helps you create, manage, and share your professional profile. 
-                Build your portfolio in minutes and apply for jobs with ease.
+                Career Nest helps you create, manage, and share your professional profile. Build your portfolio in
+                minutes and apply for jobs with ease.
               </p>
               <div className="flex flex-wrap justify-center gap-4 mt-8">
-                <Link
-                  href="/professional"
-                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
-                  prefetch={false}
+                <Button
+                  onClick={() => openAuthModal("professional")}
+                  className="bg-primary px-8 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-primary/90"
                 >
                   Professional
-                </Link>
-                <Link
-                  href="/academia"
-                  className="inline-flex h-10 items-center justify-center rounded-md border border-primary bg-transparent px-8 py-2 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
-                  prefetch={false}
+                </Button>
+                <Button
+                  onClick={() => openAuthModal("academia")}
+                  variant="outline"
+                  className="border-primary bg-transparent px-8 py-2 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/10"
                 >
                   Academia
-                </Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -61,8 +67,8 @@ export default function Homepage() {
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Build. Share. Apply.</h2>
                 <p className="mt-4 max-w-[800px] text-gray-500 md:text-xl/relaxed dark:text-gray-400">
-                  Career Nest streamlines your job search by creating professional summaries that highlight your
-                  skills and experience. One profile, countless opportunities.
+                  Career Nest streamlines your job search by creating professional summaries that highlight your skills
+                  and experience. One profile, countless opportunities.
                 </p>
               </div>
             </div>
@@ -70,13 +76,15 @@ export default function Homepage() {
               <div className="grid gap-1 p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 h-full">
                 <h3 className="text-xl font-bold">Smart Profile Builder</h3>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Create tailored professional profiles with our intuitive builder. Add your skills, experience, and links to your portfolio.
+                  Create tailored professional profiles with our intuitive builder. Add your skills, experience, and
+                  links to your portfolio.
                 </p>
               </div>
               <div className="grid gap-1 p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 h-full">
                 <h3 className="text-xl font-bold">One-Click Applications</h3>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Apply to multiple job postings with a single click. Your profile is automatically formatted for each application.
+                  Apply to multiple job postings with a single click. Your profile is automatically formatted for each
+                  application.
                 </p>
               </div>
               <div className="grid gap-1 p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800 h-full">
@@ -100,11 +108,13 @@ export default function Homepage() {
           </Link>
         </nav>
       </footer>
+
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} type={authType} />
     </div>
-  );
+  )
 }
 
-function NestIcon(props:any) {
+function NestIcon(props: any) {
   return (
     <svg
       {...props}
@@ -122,5 +132,5 @@ function NestIcon(props:any) {
       <path d="m8 8 8 8" />
       <path d="m16 8-8 8" />
     </svg>
-  );
+  )
 }

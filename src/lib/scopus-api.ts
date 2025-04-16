@@ -33,3 +33,56 @@ export async function searchScopus(query: string) {
     throw error;
   }
 }
+
+
+
+// Search for Google Scholar profiles
+export async function searchScholarProfiles(query: string) {
+  try {
+    const response = await fetch(`/api/scholar/profiles?query=${encodeURIComponent(query)}`)
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || `API error: ${response.status}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching Google Scholar profiles:", error)
+    throw error
+  }
+}
+
+// Search for Google Scholar citations using result_id
+export async function searchScholarCitations(resultId: string) {
+  try {
+    const response = await fetch(`/api/scholar/citations?resultId=${encodeURIComponent(resultId)}`)
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || `API error: ${response.status}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching Google Scholar citations:", error)
+    throw error
+  }
+}
+
+// Search for Google Scholar articles
+export async function searchScholarArticles(query: string) {
+  try {
+    const response = await fetch(`/api/scholar/articles?query=${encodeURIComponent(query)}`)
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || `API error: ${response.status}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching Google Scholar articles:", error)
+    throw error
+  }
+}
