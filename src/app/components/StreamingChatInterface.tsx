@@ -10,15 +10,16 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism"
 
-interface ChatInterfaceProps {
+interface StreamingChatInterfaceProps {
   resumeFile: File | null
   jobDescription: string
 }
 
-export default function ChatInterface({ resumeFile, jobDescription }: ChatInterfaceProps) {
+export default function StreamingChatInterface({ resumeFile, jobDescription }: StreamingChatInterfaceProps) {
   const [latexCode, setLatexCode] = useState<string>("")
   const [isCopied, setIsCopied] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isStreaming, setIsStreaming] = useState(false)
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [activeTab, setActiveTab] = useState("latex")
   const [error, setError] = useState<string | null>(null)
@@ -27,7 +28,7 @@ export default function ChatInterface({ resumeFile, jobDescription }: ChatInterf
 
   // Simulate loading progress while waiting for API response
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading && !isStreaming) {
       const interval = setInterval(() => {
         setLoadingProgress((prev) => {
           if (prev >= 95) return prev // Cap at 95% until actual completion
@@ -36,14 +37,14 @@ export default function ChatInterface({ resumeFile, jobDescription }: ChatInterf
         })
       }, 800)
       return () => clearInterval(interval)
-    } else {
+    } else if (!isLoading) {
       setLoadingProgress(100) // Set to 100% when loading is complete
     }
-  }, [isLoading])
+  }, [isLoading, isStreaming])
 
   // Extract improvements from the LaTeX code
   useEffect(() => {
-    if (latexCode) {
+    if (latexCode && latexCode.length > 100) {
       // This is a simple extraction - in a real app, you might want to
       // generate these improvements from the AI directly
       const extractedImprovements = [
@@ -59,45 +60,80 @@ export default function ChatInterface({ resumeFile, jobDescription }: ChatInterf
     }
   }, [latexCode])
 
-  // Send the resume and job description to the API
+  // Send the resume and job description to the API with streaming support
   useEffect(() => {
     const submitResume = async () => {
       if (resumeFile && jobDescription) {
         setIsLoading(true)
         setLoadingProgress(0)
         setError(null)
+        setLatexCode("")
 
         const formData = new FormData()
         formData.append("resume", resumeFile)
         formData.append("jobDescription", jobDescription)
 
         try {
-          console.log("Submitting resume to API...")
-          const response = await fetch("/api/optimize-resume", {
-            method: "POST",
-            body: formData,
-          })
+          // First, check if the streaming endpoint is available
+          const streamingEndpoint = "/api/optimize-resume-stream"
 
-          console.log("API response status:", response.status)
+          try {
+            // Try streaming first
+            setIsStreaming(true)
+            const response = await fetch(streamingEndpoint, {
+              method: "POST",
+              body: formData,
+            })
 
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
-            throw new Error(errorData.error || `Server error: ${response.status}`)
+            if (!response.ok) {
+              throw new Error("Streaming not available")
+            }
+
+            // Handle streaming response
+            const reader = response.body?.getReader()
+            if (!reader) throw new Error("Response body is not readable")
+
+            const decoder = new TextDecoder()
+            let streamedText = ""
+
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+
+              const chunk = decoder.decode(value, { stream: true })
+              streamedText += chunk
+              setLatexCode(streamedText)
+
+              // Update progress based on streaming
+              setLoadingProgress((prev) => Math.min(95, prev + 2))
+            }
+
+            setIsLoading(false)
+            setIsStreaming(false)
+          } catch (streamError) {
+            console.log("Streaming not available, falling back to standard API", streamError)
+            setIsStreaming(false)
+
+            // Fall back to standard API
+            const response = await fetch("/api/optimize-resume", {
+              method: "POST",
+              body: formData,
+            })
+
+            if (!response.ok) {
+              const errorData = await response.json()
+              throw new Error(errorData.error || "Failed to optimize resume")
+            }
+
+            const data = await response.json()
+            setLatexCode(data.latex)
+            setIsLoading(false)
           }
-
-          const data = await response.json()
-          console.log("Received response data", { dataLength: data.latex?.length || 0 })
-
-          if (!data.latex) {
-            throw new Error("No LaTeX content received from the server")
-          }
-
-          setLatexCode(data.latex)
-          setIsLoading(false)
         } catch (error) {
           console.error("Error submitting resume:", error)
           setError(error instanceof Error ? error.message : "An unknown error occurred")
           setIsLoading(false)
+          setIsStreaming(false)
         }
       }
     }
@@ -125,32 +161,78 @@ export default function ChatInterface({ resumeFile, jobDescription }: ChatInterf
     setIsLoading(true)
     setLoadingProgress(0)
     setError(null)
+    setLatexCode("")
 
     // Re-submit the form data
     const formData = new FormData()
     if (resumeFile) formData.append("resume", resumeFile)
     if (jobDescription) formData.append("jobDescription", jobDescription)
 
-    fetch("/api/optimize-resume", {
+    // Try streaming first, then fall back to standard API
+    fetch("/api/optimize-resume-stream", {
       method: "POST",
       body: formData,
     })
       .then((response) => {
         if (!response.ok) {
-          return response.json().then((data) => {
-            throw new Error(data.error || "Failed to optimize resume")
+          throw new Error("Streaming not available")
+        }
+
+        setIsStreaming(true)
+        const reader = response.body?.getReader()
+        if (!reader) throw new Error("Response body is not readable")
+
+        const decoder = new TextDecoder()
+        let streamedText = ""
+
+        function processStream() {
+          return reader!.read().then(({ done, value }) => {
+            if (done) {
+              setIsLoading(false)
+              setIsStreaming(false)
+              return
+            }
+
+            const chunk = decoder.decode(value, { stream: true })
+            streamedText += chunk
+            setLatexCode(streamedText)
+
+            // Update progress based on streaming
+            setLoadingProgress((prev) => Math.min(95, prev + 2))
+
+            return processStream()
           })
         }
-        return response.json()
+
+        return processStream()
       })
-      .then((data) => {
-        setLatexCode(data.latex)
-        setIsLoading(false)
+      .catch((streamError) => {
+        console.log("Streaming retry failed, using standard API", streamError)
+        setIsStreaming(false)
+
+        // Fall back to standard API
+        return fetch("/api/optimize-resume", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then((data) => {
+                throw new Error(data.error || "Failed to optimize resume")
+              })
+            }
+            return response.json()
+          })
+          .then((data) => {
+            setLatexCode(data.latex)
+            setIsLoading(false)
+          })
       })
       .catch((error) => {
-        console.error("Error submitting resume:", error)
+        console.error("Error retrying resume optimization:", error)
         setError(error instanceof Error ? error.message : "An unknown error occurred")
         setIsLoading(false)
+        setIsStreaming(false)
       })
   }
 
@@ -165,7 +247,9 @@ export default function ChatInterface({ resumeFile, jobDescription }: ChatInterf
             </CardTitle>
             <CardDescription className="text-zinc-400">
               {isLoading
-                ? "Analyzing and enhancing your resume..."
+                ? isStreaming
+                  ? "Generating optimized LaTeX code in real-time..."
+                  : "Analyzing and enhancing your resume..."
                 : "Your resume has been optimized for the target job description"}
             </CardDescription>
           </div>
@@ -174,11 +258,16 @@ export default function ChatInterface({ resumeFile, jobDescription }: ChatInterf
               <CheckCircle className="mr-1 h-3 w-3" /> Optimization Complete
             </Badge>
           )}
+          {isStreaming && (
+            <Badge variant="outline" className="bg-blue-950/30 text-blue-400 border-blue-800/50 animate-pulse">
+              <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Streaming
+            </Badge>
+          )}
         </div>
       </CardHeader>
 
       <CardContent className="p-6">
-        {isLoading ? (
+        {isLoading && !isStreaming ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="relative w-20 h-20 mb-6">
               <div className="absolute inset-0 rounded-full border-4 border-zinc-800/50"></div>
@@ -229,6 +318,47 @@ export default function ChatInterface({ resumeFile, jobDescription }: ChatInterf
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        ) : isStreaming ? (
+          <div className="flex flex-col">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center">
+                <Loader2 className="h-5 w-5 text-blue-400 mr-2 animate-spin" />
+                <h3 className="text-lg font-medium text-white">Generating LaTeX Code</h3>
+              </div>
+              <Badge variant="outline" className="bg-blue-950/30 text-blue-400 border-blue-800/50">
+                Streaming in real-time
+              </Badge>
+            </div>
+
+            <div className="bg-zinc-900/80 border border-zinc-800 rounded-lg overflow-hidden">
+              <div className="bg-zinc-800/80 px-4 py-2 text-xs text-zinc-400 flex justify-between items-center">
+                <span>optimized_resume.tex</span>
+                <span>{latexCode.length} characters</span>
+              </div>
+              <div className="max-h-[500px] overflow-auto">
+                <SyntaxHighlighter
+                  language="latex"
+                  style={oneDark}
+                  customStyle={{
+                    margin: 0,
+                    padding: "1rem",
+                    background: "transparent",
+                    fontSize: "0.875rem",
+                  }}
+                  wrapLongLines={true}
+                >
+                  {latexCode || "Waiting for content..."}
+                </SyntaxHighlighter>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-center">
+              <div className="flex items-center text-sm text-zinc-400">
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                AI is generating your optimized resume. This may take a minute...
+              </div>
             </div>
           </div>
         ) : error ? (

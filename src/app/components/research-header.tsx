@@ -77,7 +77,7 @@ export function ResearchHeader() {
               <circle cx="12" cy="12" r="3" />
             </svg>
           </div>
-          <h1 className="text-xl font-bold tracking-tight">Infosphere</h1>
+          <h1 className="text-xl font-bold tracking-tight">CareerNest</h1>
         </div>
 
         <DropdownMenu>
