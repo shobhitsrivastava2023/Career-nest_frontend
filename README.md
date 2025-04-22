@@ -1,35 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Career Nest
 
-First, run the development server:
+-  Job listing through scraping numerous other platform. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- AI based resume enhancer based on provided job description.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Job market insights ( Layoffs, trending company, trending skills, valuation, compensation etc. ) 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- External link to useful resources. 
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Search through google Scholar (made specifically for researchers and scientists)
 
-## Learn More
+- manage your citations, papers, through single platform. And browse through user profile over google scholar. 
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pleaase keep in mind this is not official repository for the product rather just the frontend which was in very initial stage. 
+ We will soon public the main repository. 
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+# Interface 
+
+
+
+![Dashboard](https://4ynp0ggkfk.ufs.sh/f/l0ceiZJFrvqoQdB1l2zSoDPjrep9VEyMksdg1OTt7nxQia8G)
+
+
+
+
+![Dashboard](https://4ynp0ggkfk.ufs.sh/f/l0ceiZJFrvqo3PZGgYEHaK8B7U1GyCOPgzlcW2AHbJS4iIQh)
+
+![Scraped](https://4ynp0ggkfk.ufs.sh/f/l0ceiZJFrvqo2zfeaBjO7QrRLpzfgDvuxwkWbT20aUilNMEd)
+
+![Location trends](https://4ynp0ggkfk.ufs.sh/f/l0ceiZJFrvqoTiYG4dFvEeWmHabY08nwplOqrKch4DVdT6Ix)
+
+![resume optimizer](https://4ynp0ggkfk.ufs.sh/f/l0ceiZJFrvqo0erPb9M7zhNeGktcM3ouWmdy1Y6CLxVfXQpK)
+
+![resume output](https://4ynp0ggkfk.ufs.sh/f/l0ceiZJFrvqo82LHplIKTFZpOhufjYMlsvDcC7JSVmAEqnWt)
+
+![research](https://4ynp0ggkfk.ufs.sh/f/l0ceiZJFrvqoUKXz3Rabs1Tyf9rEUcui3PYd7gCvVALNQq0Z)
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
